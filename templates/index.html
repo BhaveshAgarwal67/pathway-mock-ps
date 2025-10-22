@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Barebones KYC Checker</title>
+<style>
+body { font-family:"Segoe UI",sans-serif; background:#f4f4f4; display:flex; justify-content:center; align-items:flex-start; min-height:100vh; margin:0; padding:40px 20px;}
+.container { width:100%; max-width:600px; background:#fff; padding:30px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); text-align:center;}
+h1,h2,h3 { color:#333; margin-top:0;}
+form { margin-bottom:30px;}
+input[type="file"] { margin:10px 0;}
+button { background-color:#4CAF50;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;font-size:1rem;}
+button:hover { background-color:#45a049;}
+.result, .error { padding:20px; border-radius:8px; margin-top:20px;}
+.result { background:#e7f9ee; border-left:5px solid #4CAF50;}
+.error { background:#fdecea; border-left:5px solid #f44336; color:#a94442;}
+ul { text-align:left; padding-left:20px;}
+.flags { margin-top:10px; text-align:left;}
+.flag-badge { display:inline-block; padding:5px 10px; border-radius:12px; margin:3px 5px 3px 0; font-size:0.9rem; color:#fff; background-color:#d32f2f;}
+.badge-summary { display:inline-block; padding:7px 15px; border-radius:15px; font-weight:bold; color:#fff; margin-bottom:15px;}
+.badge-summary.verified { background-color:#4CAF50;}
+.badge-summary.mismatch { background-color:#d32f2f;}
+.note { font-size:0.9rem; color:#555; margin-bottom:15px;}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Barebones KYC Checker</h1>
+
+{% if error %}
+<div class="error">{{ error }}</div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+<label><strong>PAN Card (mandatory):</strong></label><br>
+<input type="file" name="pan_document" accept=".pdf,.txt,.png,.jpg,.jpeg" required><br>
+<span class="note">Allowed file types: PDF, TXT, PNG, JPG, JPEG</span><br>
+
+<label><strong>Other Document(s):</strong></label><br>
+<input type="file" name="other_documents" accept=".pdf,.txt,.png,.jpg,.jpeg" multiple required><br>
+<span class="note">Allowed file types: PDF, TXT, PNG, JPG, JPEG</span><br><br>
+
+<button type="submit">Verify</button>
+</form>
+
+{% if result %}
+<div class="result">
+{% if result.summary=="Verified ✅" %}
+<div class="badge-summary verified">Verified</div>
+{% else %}
+<div class="badge-summary mismatch">Mismatch Found</div>
+{% endif %}
+
+{% if result.flags %}
+<div class="flags">
+<h3>Flags:</h3>
+{% for f in result.flags %}
+<span class="flag-badge">{{ f }}</span>
+{% endfor %}
+</div>
+{% endif %}
+
+<h3>PAN Card Info</h3>
+<ul>
+<li><strong>Name:</strong> {{ result.pan_info.name }}</li>
+<li><strong>DOB:</strong> {{ result.pan_info.dob }}</li>
+<li><strong>PAN Number:</strong> {{ result.pan_info.pan }}</li>
+</ul>
+
+{% for doc in result.other_docs %}
+<h3>Document {{ loop.index }} Info</h3>
+<ul>
+<li><strong>ID:</strong> {{ doc.generic_id }}</li>
+</ul>
+{% endfor %}
+</div>
+{% endif %}
+</div>
+</body>
+</html>
