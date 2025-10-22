@@ -1,4 +1,6 @@
-flask
-pillow
-pytesseract
-opencv-python
+Flask==2.3.3
+PyMuPDF==1.23.6
+easyocr==1.7.0
+torch==2.1.0
+opencv-python-headless==4.8.1.78
+numpy==1.27.5
